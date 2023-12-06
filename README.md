@@ -5,6 +5,15 @@
   - https://github.com/ethereum-optimism/developers/discussions
 ## INSTALLATION from folder _docker001
 
+### make sure to add in the wallets and other details into the .env file first
+
+see you have the correct version:
+https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/scripts/getting-started/versions.sh
+
+get new wallets:
+https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/scripts/getting-started/wallets.sh
+
+
 #### run the following in bash:
 - `./build.sh`  to build
 - `./build.sh test` to run in prompt
