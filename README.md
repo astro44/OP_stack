@@ -14,7 +14,7 @@ get new wallets:
 https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/scripts/getting-started/wallets.sh
 
 
-## run the following in bash:
+## RUN the following in bash IN the _docker001 dir:
 - `./build.sh`  to build
 - `./build.sh test` to run in prompt
 
