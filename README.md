@@ -1,5 +1,5 @@
 # Initial Setup
-  see https://stack.optimism.io/docs/build/getting-started/#configure-your-network
+  see https://docs.optimism.io/builders/chain-operators/tutorials/create-l2-rollup
    More info: 
   - https://discord.gg/optimism
   - https://github.com/ethereum-optimism/developers/discussions
