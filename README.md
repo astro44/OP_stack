@@ -25,7 +25,12 @@ use the below to get a new value:
 ```
 #### If you see:
 ``` bash
-    nondescript error that includes EvmError: Revert and Script failed then you likely need to change the IMPL_SALT environment variable. This variable determines the addresses of various smart contracts that are deployed via CREATE2. If the same IMPL_SALT is used to deploy the same contracts twice, the second deployment will fail. You can generate a new IMPL_SALT by running direnv allow anywhere in the Optimism Monorepo.
+    nondescript error that includes EvmError: Revert and Script failed \
+    then you likely need to change the IMPL_SALT environment variable. \
+    This variable determines the addresses of various smart contracts that \
+     are deployed via CREATE2. If the same IMPL_SALT is used to deploy the \
+     same contracts twice, the second deployment will fail. You can generate \
+     a new IMPL_SALT by running direnv allow anywhere in the Optimism Monorepo.
 ```
 
 
