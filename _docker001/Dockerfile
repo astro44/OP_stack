@@ -55,6 +55,8 @@ RUN git clone https://github.com/ethereum-optimism/optimism.git \
     && cd optimism \
     && pnpm install \
     && cd ../
+
+# The below is the most problematic part of the build.  It takes a long time and often fails.
 # make NODE BATCHER PROPOSER
 RUN cd optimism \
     && make VERBOSE=1 op-node op-batcher op-proposer \
@@ -128,7 +130,9 @@ RUN cd /optimism \
 RUN cd /optimism/packages/contracts-bedrock \
     && forge script scripts/Deploy.s.sol:Deploy --private-key $GS_ADMIN_PRIVATE_KEY --broadcast --rpc-url $L1_RPC_URL
 
-RUN forge script scripts/Deploy.s.sol:Deploy --sig 'sync()' --rpc-url $L1_RPC_URL
+RUN cd /optimism/packages/contracts-bedrock \
+    && ls . \
+    && forge script scripts/Deploy.s.sol:Deploy --sig 'sync()' --rpc-url $L1_RPC_URL
 
 # Generate the L2 config files
 RUN cd /optimism \
@@ -141,16 +145,13 @@ RUN cd /optimism \
     --l1-rpc $L1_RPC_URL
 
 # RUN openssl rand from sh file since docker shell isn't dynamic
-RUN cd /optimism \
-    && cd op-node \
-    && /generate_jwt.sh \
-    && cp genisis.json /op-geth \
-    && cp jwt.txt /op-geth
+RUN /generate_jwt.sh \
+    && cp /jwt.txt /op-geth \
+    && cp /jwt.txt /optimism/op-node \
+    && cp /optimism/op-node/genesis.json /op-geth
 
-RUN cd /optimism \
-    && cd op-geth \
+RUN cd /op-geth \
     && mkdir datadir \
-    && cd op-geth \
     && build/bin/geth init --datadir=datadir genesis.json
 
 # Set the working directory
@@ -161,3 +162,21 @@ RUN cd /optimism \
 
 # Command to run the application
 # CMD ["your_command_here"]
+# docker run -d -p 8551:8551 -p 8547:8547 -p 8545:8545 optimism-env op-node op-batcher
+
+# docker run -d --name op-geth --network="host" -p 8545:8545 optimism-env op-geth
+# docker run -d --name op-geth --network="host" optimism-env op-geth
+# docker run -d --name op-node --network="host" -p 8547:8547 optimism-env op-node
+# docker run -d --name op-node --network="host" optimism-env op-node
+# docker run -d --name op-batcher -p 8548:8548 optimism-env op-batcher
+# docker run -d --name op-proposer -p 8560:8560 optimism-env op-proposer
+
+# docker run -d --name optimism-services -p 8547:8547 -p 8548:8548 -p 8560:8560 optimism-env op-node op-batcher op-proposer
+
+
+# docker run -d --name optimism-services -p 8547:8547 -p 8548:8548 -p 8560:8560 optimism-env op-node op-batcher op-proposer
+
+# docker run -d --name optimism-all --network="host" optimism-env op-geth op-node op-batcher op-proposer
+
+# docker run -d --name op-batcher --network="host" optimism-env op-batcher
+# docker run -d --name op-proposer --network="host" optimism-env op-proposer
