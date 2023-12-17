@@ -17,10 +17,10 @@ https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-be
 
 ## RUN the following in bash IN the _docker001 dir:
 - `./build.sh`  to build
-- `docker-compose -p op-services up -d` to run in prompt
+- `docker-compose -p op-stack up op-services -d` to run in prompt
 ## OR....
 ## RUN the following for Child node
-- `docker-compose -p op-node up -d`
+- `docker-compose -p op-stack up op-node -d`
 
 
 ### Swap out the IMPL_SALT value before every new "chain" build!
