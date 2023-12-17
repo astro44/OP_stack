@@ -189,3 +189,26 @@ ENV L1_RPC_KIND='na'
 # copy from file over existing .envr
 RUN cp /optimism/.envrc.example /optimism/.envrc
 
+<<<<<<< HEAD
+=======
+# Command to run the application
+# CMD ["your_command_here"]
+# docker run -d -p 8551:8551 -p 8547:8547 -p 8545:8545 optimism-env op-node op-batcher
+
+# docker run -d --name op-geth --network="host" -p 8545:8545 optimism-env op-geth
+# docker run -d --name op-geth --network="host" optimism-env op-geth
+# docker run -d --name op-node --network="host" -p 8547:8547 optimism-env op-node
+# docker run -d --name op-node --network="host" optimism-env op-node
+# docker run -d --name op-batcher -p 8548:8548 optimism-env op-batcher
+# docker run -d --name op-proposer -p 8560:8560 optimism-env op-proposer
+
+# docker run -d --name optimism-services -p 8547:8547 -p 8548:8548 -p 8560:8560 optimism-env op-node op-batcher op-proposer
+
+
+# docker run -d --name optimism-services -p 8547:8547 -p 8548:8548 -p 8560:8560 optimism-env op-node op-batcher op-proposer
+
+# docker run -d --name optimism-all --network="host" optimism-env op-geth op-node op-batcher op-proposer
+
+# docker run -d --name op-batcher --network="host" optimism-env op-batcher
+# docker run -d --name op-proposer --network="host" optimism-env op-proposer
+>>>>>>> 4322215150538094fc4feeb5d48154c5581c50ea
