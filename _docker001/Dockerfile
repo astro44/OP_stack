@@ -55,6 +55,8 @@ RUN git clone https://github.com/ethereum-optimism/optimism.git \
     && cd optimism \
     && pnpm install \
     && cd ../
+
+# The below is the most problematic part of the build.  It takes a long time and often fails.
 # make NODE BATCHER PROPOSER
 RUN cd optimism \
     && make VERBOSE=1 op-node op-batcher op-proposer \
@@ -80,6 +82,12 @@ ARG L1_RPC_URL
 ARG L1_RPC_KIND
 ARG DEPLOYMENT_CONTEXT
 ARG IMPL_SALT
+ARG L2_CHAIN_ID
+ARG L2_BLOCK_TIME
+ARG L2_FINALIZE_PERIOD
+ARG L2_GOV_SYMBOL
+ARG L2_GOV_NAME
+ARG EPOCH_SECS_INIT
 
 # Set environment variables
 ENV GS_ADMIN_ADDRESS=$GS_ADMIN_ADDRESS
@@ -94,13 +102,22 @@ ENV L1_RPC_URL=$L1_RPC_URL
 ENV L1_RPC_KIND=$L1_RPC_KIND
 ENV DEPLOYMENT_CONTEXT=$DEPLOYMENT_CONTEXT
 ENV IMPL_SALT=$IMPL_SALT
+ENV L2_CHAIN_ID=$L2_CHAIN_ID
+ENV L2_BLOCK_TIME=$L2_BLOCK_TIME
+ENV L2_FINALIZE_PERIOD=$L2_FINALIZE_PERIOD
+ENV L2_GOV_SYMBOL=$L2_GOV_SYMBOL
+ENV L2_GOV_NAME=$L2_GOV_NAME
+ENV EPOCH_SECS_INIT=$EPOCH_SECS_INIT
+
 
 # Copy the entrypoint script will run in cd optimism via sh
 COPY entrypoint.sh /entrypoint.sh
 COPY generate_jwt.sh /generate_jwt.sh
+COPY _config.sh /optimism/packages/contracts-bedrock/scripts/getting-started/config.sh
 
 RUN chmod +x /entrypoint.sh \
-    && ./entrypoint.sh varsOnly
+    && ./entrypoint.sh varsOnly \
+    && chmod +x /optimism/packages/contracts-bedrock/scripts/getting-started/config.sh
 
 # Set the entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
@@ -113,7 +130,9 @@ RUN cd /optimism \
     && echo "GS_PROPOSER_ADDRESS: $GS_PROPOSER_ADDRESS" \
     && echo "L1_RPC_URL: $L1_RPC_URL" \
     && echo "IMPL_SALT: $IMPL_SALT" \
+    && echo "$L2_CHAIN_ID: $L2_CHAIN_ID" \
     && cd /
+
 
 # SETUP config files
 RUN cd /optimism \
@@ -121,14 +140,20 @@ RUN cd /optimism \
     && cat .envrc \
     && cd ./packages/contracts-bedrock \
     && ./scripts/getting-started/config.sh \
+    && ls /optimism/packages/contracts-bedrock/scripts/getting-started/ \
     # && cd dude \
+    # && cat /optimism/packages/contracts-bedrock/scripts/getting-started/config.sh \
     && cd /
 
-# DEPLOY CONTRACTS  direnv allow will generate new salt each time.
-RUN cd /optimism/packages/contracts-bedrock \
+
+# DEPLOY CONTRACTS  direnv allow will generate new salt each time. running entrypoint to make sure .envr is updated
+RUN ./entrypoint.sh varsOnly \
+    && cd /optimism/packages/contracts-bedrock \
     && forge script scripts/Deploy.s.sol:Deploy --private-key $GS_ADMIN_PRIVATE_KEY --broadcast --rpc-url $L1_RPC_URL
 
-RUN forge script scripts/Deploy.s.sol:Deploy --sig 'sync()' --rpc-url $L1_RPC_URL
+RUN cd /optimism/packages/contracts-bedrock \
+    && ls . \
+    && forge script scripts/Deploy.s.sol:Deploy --sig 'sync()' --rpc-url $L1_RPC_URL
 
 # Generate the L2 config files
 RUN cd /optimism \
@@ -141,23 +166,26 @@ RUN cd /optimism \
     --l1-rpc $L1_RPC_URL
 
 # RUN openssl rand from sh file since docker shell isn't dynamic
-RUN cd /optimism \
-    && cd op-node \
-    && /generate_jwt.sh \
-    && cp genisis.json /op-geth \
-    && cp jwt.txt /op-geth
+RUN /generate_jwt.sh \
+    && cp /jwt.txt /op-geth \
+    && cp /jwt.txt /optimism/op-node \
+    && cp /optimism/op-node/genesis.json /op-geth
 
-RUN cd /optimism \
-    && cd op-geth \
+RUN cd /op-geth \
     && mkdir datadir \
-    && cd op-geth \
     && build/bin/geth init --datadir=datadir genesis.json
 
-# Set the working directory
-# WORKDIR /optimism
+RUN apt-get update -y \
+    && apt-get install net-tools iproute2 -y
 
-# Expose necessary ports (if any)
-# EXPOSE <port>
+# CLEAN UP vars to nothing *SECURITY REASONS
+ENV GS_ADMIN_PRIVATE_KEY='na'
+ENV GS_BATCHER_PRIVATE_KEY='na'
+ENV GS_PROPOSER_PRIVATE_KEY='na'
+ENV GS_SEQUENCER_PRIVATE_KEY='na'
+ENV L1_RPC_URL='na'
+ENV L1_RPC_KIND='na'
 
-# Command to run the application
-# CMD ["your_command_here"]
+# copy from file over existing .envr
+RUN cp /optimism/.envrc.example /optimism/.envrc
+

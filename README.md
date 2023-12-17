@@ -1,6 +1,6 @@
-# Initial Setup
+# Initial Setup - this is not regularly maintained and should be considered a starting/learning point.
   see https://stack.optimism.io/docs/build/getting-started/#configure-your-network
-   More info: 
+   More info:
   - https://discord.gg/optimism
   - https://github.com/ethereum-optimism/developers/discussions
 ## INSTALLATION from folder _docker001
@@ -16,9 +16,13 @@ https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-be
 
 ## RUN the following in bash IN the _docker001 dir:
 - `./build.sh`  to build
-- `./build.sh test` to run in prompt
+- `docker-compose -p op-services up -d` to run in prompt
+## OR....
+## RUN the following for Child node
+- `docker-compose -p op-node up -d`
 
-### Swap out the IMPL_SALT value before every build!
+
+### Swap out the IMPL_SALT value before every new "chain" build!
 use the below to get a new value:
 ``` bash
     echo (openssl rand -hex 32)

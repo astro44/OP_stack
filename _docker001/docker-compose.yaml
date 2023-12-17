@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+    op-services:
+        image: optimism-stack
+        command: op-geth op-node op-batcher op-proposer
+        env_file:
+        - .env
+        restart: unless-stopped
+        ports:
+        - "8545:8545"
+        - "8546:8546"
+        - "42069:42069"
+        - "9003:9003"
+
+    op-node:
+        image: optimism-stack
+        command: child-init op-geth op-node
+        env_file:
+        - .env
+        restart: unless-stopped
+        ports:
+        - "8545:8545"
+        - "8546:8546"
+        - "42069:42069"
+        - "9003:9003"
+
+
+# docker-compose up -d op-services
+# docker-compose up -d op-node
+
+#####################################################################################################
+#####################################################################################################
+#Don't forget to send ETH to the chain contract address currently:
+# 0x82d6D812f9aC9f171c53e5E7e71C32bdf2a5ac536f1
+# you can check by cd into op-geth and /optimism/packages/contracts-bedrock
+# and then cat deployments/getting-started/L1StandardBridgeProxy.json | jq -r .address
+#####################################################################################################
+#####################################################################################################
+
