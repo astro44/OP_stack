@@ -16,6 +16,7 @@ https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-be
 
 
 ## RUN the following in bash IN the _docker001 dir:
+- cd _docker001
 - `./build.sh`  to build
 - `docker-compose -p op-stack up op-services -d` to run in prompt
 ## OR....
